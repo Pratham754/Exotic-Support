@@ -11,6 +11,9 @@ import zipfile
 import logging
 import json
 
+from keep_alive import keep_alive
+keep_alive()
+
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 
