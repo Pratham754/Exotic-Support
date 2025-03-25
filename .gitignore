@@ -1,0 +1,6 @@
+.dockerignore
+.env
+Dockerfile
+events.py
+justincase.py
+original.py
