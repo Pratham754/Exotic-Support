@@ -467,11 +467,11 @@ async def help(ctx):
     embed.add_field(name=">delete @ticket_owner {reason}",
                     value="Delete a closed ticket channel with a reason.\n ‏", inline=False)
 
-    embed.add_field(name=">help",
-                    value="Show this list of available commands.", inline=False)
-    
     embed.add_field(name=">staffbreak",
                     value="Initiate a staff break by providing a reason, duration, and return date.\n ‏", inline=False)
+    
+    embed.add_field(name=">help",
+                    value="Show this list of available commands.\n ‏", inline=False)
 
     embed.set_footer(text="Exotic", icon_url=bot.user.display_avatar.url)
 
