@@ -131,9 +131,16 @@ async def userwith(ctx, role_id: int):
     if not members:
         return await ctx.send(f"No members have the role '{role.name}'.")
 
-    embed = discord.Embed(title=f"Members with '{role.name}' role:", description="\n".join(members), color=discord.Color.teal())
-    await ctx.send(embed=embed if len(embed.description) <= 2000 else "Too many users to display.")
-
+    # Split members into chunks of 50 per embed (to stay within Discord's limits)
+    chunk_size = 50
+    for i in range(0, len(members), chunk_size):
+        embed = discord.Embed(
+            title=f"Members with '{role.name}' role:",
+            description="\n".join(members[i:i + chunk_size]),
+            color=discord.Color.teal()
+        )
+        await ctx.send(embed=embed)
+        
 @bot.event
 async def on_guild_channel_create(channel):
     if isinstance(channel, discord.TextChannel) and channel.name.startswith("ticket-"):
