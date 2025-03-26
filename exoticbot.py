@@ -341,11 +341,13 @@ async def on_guild_channel_update(before, after):
 # Command to delete a ticket channel
 @bot.command()
 async def delete(ctx, ticket_owner: discord.User, *, reason: str = "No reason provided"):
-    who_closed = ctx.author  # The staff member who closed the ticket
+   who_closed = ctx.author
 
-    # Allow users with the specific role or manage_channels permission to use this command
     role_id = 1343676013347082300
-    if not any(role.id == role_id for role in ctx.author.roles) and not ctx.author.permissions_in(ctx.channel).manage_channels:
+    has_required_role = any(role.id == role_id for role in ctx.author.roles)
+    has_manage_channels = ctx.channel.permissions_for(ctx.author).manage_channels
+
+    if not has_required_role and not has_manage_channels:
         return await ctx.send("You do not have permission to use this command.")
 
     if not isinstance(ctx.channel, discord.TextChannel):
