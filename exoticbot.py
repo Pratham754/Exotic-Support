@@ -164,6 +164,7 @@ async def send_ticket_message(channel):
         ("Roles", discord.ButtonStyle.primary, "assistance_roles"),
         ("Invite Rewards", discord.ButtonStyle.primary, "assistance_rewards"),
         ("Partnership", discord.ButtonStyle.primary, "assistance_partnership"),
+        ("Fisch Middleman", discord.ButtonStyle.primary, "assistance_fisch"),
         ("Complaint", discord.ButtonStyle.danger, "assistance_complaint"),
         ("Any Other Query", discord.ButtonStyle.secondary, "assistance_other")
     ]
@@ -219,6 +220,7 @@ async def on_interaction(interaction: discord.Interaction):
         "assistance_roles": "You'll be taken care of ASAP regarding roles!\nTill then, please mention your query.",
         "assistance_rewards": "You'll be taken care of ASAP regarding invite rewards!\nTill then, please mention your query.",
         "assistance_partnership": "You'll be taken care of ASAP regarding partnership!\nTill then, please mention your query.",
+        "assistance_fisch": "You'll be connected with a <@&1354867624823099582> soon.\nThank you for your patience.",
         "assistance_complaint": "We'll address your complaint ASAP!\nTill then, please mention your query.",
         "assistance_other": "We'll assist you ASAP!\nTill then, please mention your query."
     }
@@ -374,48 +376,40 @@ async def delete(ctx, ticket_owner: discord.User, *, reason: str = "No reason pr
 @bot.command()
 async def staffbreak(ctx):
     await ctx.message.delete()
-    # Check if the command is run in the specific channel
+    
     if ctx.channel.id != 1344360595335548988:
         return await ctx.send("This command can only be used in the designated channel.")
     
-    # Ask the user to enter the reason
-    prompt_reason = await ctx.send("Please provide the reason for the staff break:")
-    
+    messages_to_delete = [] 
     def check(msg):
         return msg.author == ctx.author and msg.channel == ctx.channel
 
     try:
+        prompt_reason = await ctx.send("Please provide the reason for the staff break:")
+        messages_to_delete.append(prompt_reason)
+
         reason_msg = await bot.wait_for('message', check=check, timeout=60)
         reason = reason_msg.content
-        
-        # Delete both the bot's question and the user's response
-        await asyncio.sleep(1)
-        await prompt_reason.delete()  
-        await reason_msg.delete()
+        messages_to_delete.append(reason_msg)
 
-        # Now ask for the duration
         prompt_duration = await ctx.send("Please provide the duration of the break (e.g., 15 days):")
-        
+        messages_to_delete.append(prompt_duration)
+
         duration_msg = await bot.wait_for('message', check=check, timeout=60)
         duration = duration_msg.content
-        
-        # Delete both the bot's question and the user's response
-        await asyncio.sleep(1)
-        await prompt_duration.delete()
-        await duration_msg.delete()
+        messages_to_delete.append(duration_msg)
 
-        # Finally, ask for the return date
         prompt_return_date = await ctx.send("Please provide the return date (e.g., 13/04/25):")
-        
+        messages_to_delete.append(prompt_return_date)
+
         return_date_msg = await bot.wait_for('message', check=check, timeout=60)
         return_date = return_date_msg.content
-        
-        # Delete both the bot's question and the user's response
-        await asyncio.sleep(1)
-        await prompt_return_date.delete()
-        await return_date_msg.delete()
+        messages_to_delete.append(return_date_msg)
 
-        # Create the embed with the provided information
+        await asyncio.sleep(1)
+        await ctx.channel.delete_messages(messages_to_delete)
+
+        # Create the embed
         embed = discord.Embed(
             title="<a:exh_imp:1353418774782672917> **STAFF BREAK** <a:exh_imp:1353418774782672917>",
             description=f"""
@@ -428,13 +422,10 @@ async def staffbreak(ctx):
         )
         embed.set_footer(text="I accept the consequences if I fail to return by the specified date.")
 
-        # Send the embed to the same channel
         await ctx.send(embed=embed)
 
     except asyncio.TimeoutError:
         await ctx.send("You took too long to respond. Please try again.")
-
-
 
 # Command to show available commands
 @bot.command()
